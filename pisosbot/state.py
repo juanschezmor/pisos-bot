@@ -17,10 +17,14 @@ class State:
         self.path = path
         self.seen: dict[str, float] = {}
         self.fingerprints: dict[str, float] = {}
+        # Veredictos del clasificador, para no volver a preguntar por el mismo
+        # anuncio en cada ronda.
+        self.verdicts: dict[str, list] = {}
         if path.exists():
             raw = json.loads(path.read_text(encoding="utf-8") or "{}")
             self.seen = raw.get("seen", {})
             self.fingerprints = raw.get("fingerprints", {})
+            self.verdicts = raw.get("verdicts", {})
 
     def is_new(self, uid: str) -> bool:
         return uid not in self.seen
@@ -33,10 +37,18 @@ class State:
         self.seen[uid] = now
         self.fingerprints[fingerprint] = now
 
+    def verdict(self, uid: str) -> str | None:
+        entry = self.verdicts.get(uid)
+        return entry[0] if entry else None
+
+    def set_verdict(self, uid: str, veredicto: str) -> None:
+        self.verdicts[uid] = [veredicto, time.time()]
+
     def prune(self) -> None:
         cutoff = time.time() - RETENTION_DAYS * 86400
         self.seen = {k: v for k, v in self.seen.items() if v >= cutoff}
         self.fingerprints = {k: v for k, v in self.fingerprints.items() if v >= cutoff}
+        self.verdicts = {k: v for k, v in self.verdicts.items() if v[1] >= cutoff}
 
     def save(self) -> None:
         self.prune()
@@ -46,6 +58,7 @@ class State:
         payload = {
             "seen": dict(sorted(self.seen.items())),
             "fingerprints": dict(sorted(self.fingerprints.items())),
+            "verdicts": dict(sorted(self.verdicts.items())),
         }
         self.path.write_text(
             json.dumps(payload, ensure_ascii=False, indent=0, sort_keys=False),

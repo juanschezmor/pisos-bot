@@ -37,6 +37,11 @@ class Config:
             slugify(k): slugify(v) for k, v in (data.get("aliases") or {}).items()
         }
 
+        llm = data.get("llm", {})
+        self.llm_enabled: bool = llm.get("enabled", False)
+        self.llm_model: str = llm.get("model", "gemini-3.5-flash-lite")
+        self.llm_max_batch: int = llm.get("max_batch", 25)
+
         self.portals: dict[str, bool] = data.get("portals", {})
 
         r = data.get("runtime", {})

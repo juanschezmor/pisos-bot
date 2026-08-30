@@ -124,6 +124,9 @@ def render(x: Listing, hot: bool) -> str:
     if x.reasons:
         lines.append("✅ " + e(" · ".join(x.reasons[:3])))
 
+    if x.warning:
+        lines.append("⚠️ " + e(x.warning))
+
     footer = [x.portal]
     age = _age(x.published_ts)
     if age:

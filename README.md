@@ -46,6 +46,48 @@ fuente como un portal más sin tocar el resto.
 Fotocasa, Habitaclia y Milanuncios son del mismo grupo (Scout24) y comparten
 inventario, así que el bot deduplica entre portales antes de avisar.
 
+## Filtro de alquiler por habitaciones
+
+El falso positivo más caro del bot: un anuncio que dice "piso de 3 habitaciones"
+pero que en la descripción alquila **por habitaciones**. Lleva el precio de una
+habitación sobre la superficie del piso entero, así que su €/m² sale ridículo y
+el detector de chollos lo manda a lo más alto de la lista. Se filtra en dos
+capas:
+
+**1. Reglas** ([`shared_rental.py`](pisosbot/shared_rental.py)) — patrones de
+alta precisión: `300€/habitación`, `busco compañera de piso`, `se alquilan
+habitaciones`, `quedan 2 habitaciones libres`. No usa `slugify()` a propósito,
+porque borra el símbolo de moneda y entonces `300€/habitación` y `consta de 1
+habitación` quedan idénticos. Cubierto por 17 pruebas en las dos direcciones.
+
+**2. Clasificador** ([`llm.py`](pisosbot/llm.py)) — Gemini juzga lo que las
+reglas no pueden, del tipo *"piso exclusivo para estudiantes curso 2026-2027"*,
+donde hace falta entender la intención. Devuelve `completa`, `compartida` o
+`dudoso`: los `compartida` se descartan y los `dudoso` **sí se envían**, con un
+⚠️ en el mensaje. No perder un piso pesa más que ahorrarte un aviso.
+
+Es opcional: sin `GEMINI_API_KEY` el bot funciona igual, solo con las reglas.
+
+### Orden de las operaciones
+
+Marcar → deduplicar → descartar, y todo antes de calcular medianas. Importa:
+
+- Un mismo piso se publica dos veces con la descripción **cortada en distinto
+  sitio**, y solo una copia enseña el `300€/habitación`. Si se descarta antes de
+  deduplicar, muere la copia delatora y sobrevive la limpia. Marcando primero,
+  el indicio de una copia tumba al grupo entero.
+- Si un anuncio de habitación llega al cálculo de medianas, hunde el €/m² de
+  referencia de toda la zona y estropea la detección de chollos del resto.
+
+### Gasto
+
+Una sola petición por ronda con todos los anuncios nuevos juntos, y ninguna
+cuando no hay novedades: como mucho ~144 llamadas al día. Los veredictos se
+cachean en `state/seen.json`, así que un anuncio nunca se pregunta dos veces.
+
+Si Gemini falla, agota cuota o responde algo raro, **pasan todos los anuncios**.
+Perder un piso por una caída de terceros sería peor que un aviso de más.
+
 ## Cómo puntúa
 
 Nota de 0 a 100 por anuncio:
@@ -83,6 +125,17 @@ gh secret set TELEGRAM_BOT_TOKEN --body '<TU_TOKEN>'
 gh secret set TELEGRAM_CHAT_ID  --body '<TU_CHAT_ID>'
 ```
 
+**Opcional — clasificador de anuncios.** Saca una clave gratuita en
+[Google AI Studio](https://aistudio.google.com/apikey) y añádela:
+
+```bash
+gh secret set GEMINI_API_KEY --body '<TU_CLAVE>'
+```
+
+Sin ella el bot funciona igual, solo con la capa de reglas. Ten en cuenta que
+en el tier gratuito Google puede usar lo que se le manda para entrenar; aquí
+son descripciones públicas de anuncios de alquiler.
+
 Los secretos no son visibles aunque el repositorio sea público.
 
 **3. Ya está.** El workflow arranca solo. Para lanzarlo a mano:
@@ -103,6 +156,7 @@ solo queda la configuración de búsqueda; el token va en *Secrets*.
 ```bash
 python3 -m venv .venv && ./.venv/bin/pip install -r requirements.txt
 ./.venv/bin/python -m pisosbot.main --dry-run   # simula, no envía ni guarda
+for f in tests/test_*.py; do ./.venv/bin/python "$f"; done   # pruebas
 ```
 
 `--dry-run` imprime los mejores anuncios con su nota y el desglose, sin tocar

@@ -11,8 +11,9 @@ import os
 import pathlib
 import sys
 
-from . import config, dedupe, filters, scoring
+from . import config, dedupe, filters, llm, scoring, shared_rental
 from .http import Fetcher
+from .llm import Classifier
 from .models import Listing
 from .notify import Telegram
 from .portals import ALL
@@ -62,8 +63,22 @@ def run(args: argparse.Namespace) -> int:
     kept, rejected = filters.apply(raw, cfg)
     log.info("tras filtros: %d (descartados: %s)", len(kept), rejected or "ninguno")
 
+    # Marcar antes de fundir duplicados, descartar despues: si una sola copia
+    # del anuncio delata que se alquila por habitaciones, cae el grupo entero.
+    for x in kept:
+        x.shared_hint = shared_rental.detect(x.title, x.description) or ""
+
     unique = dedupe.collapse(kept)
     log.info("tras dedup entre portales: %d", len(unique))
+
+    por_habitaciones = [x for x in unique if x.shared_hint]
+    if por_habitaciones:
+        unique = [x for x in unique if not x.shared_hint]
+        motivos: dict[str, int] = {}
+        for x in por_habitaciones:
+            motivos[x.shared_hint] = motivos.get(x.shared_hint, 0) + 1
+        log.info("descartados %d por alquiler por habitaciones: %s",
+                 len(por_habitaciones), motivos)
 
     scored = scoring.enrich(unique, cfg)
 
@@ -74,10 +89,6 @@ def run(args: argparse.Namespace) -> int:
     ]
     log.info("nuevos para ti: %d", len(fresh))
 
-    if args.dry_run:
-        _report(scored, fresh, cfg, first_run)
-        return 0
-
     if args.seed:
         # Marca todo lo visible como ya visto, sin avisar. Util para arrancar
         # sin inundar y despues de tocar los filtros de config.yaml.
@@ -85,6 +96,12 @@ def run(args: argparse.Namespace) -> int:
             state.remember(x.uid, x.fingerprint())
         state.save()
         log.info("marcados %d anuncios como vistos, sin enviar nada", len(fresh))
+        return 0
+
+    fresh = _classify(fresh, cfg, state)
+
+    if args.dry_run:
+        _report(scored, fresh, cfg, first_run)
         return 0
 
     tg = Telegram()
@@ -122,6 +139,45 @@ def run(args: argparse.Namespace) -> int:
     state.save()
     log.info("enviados %d avisos (%d silenciados)", sent, suppressed)
     return 0
+
+
+def _classify(fresh: list[Listing], cfg: config.Config, state: State) -> list[Listing]:
+    """Descarta los anuncios de habitacion que las reglas no pudieron ver.
+
+    Solo se pregunta por los anuncios nuevos y sin veredicto previo, en una
+    unica peticion. Si no hay clave o el servicio falla, pasan todos: perder un
+    piso por una caida de terceros seria peor que un aviso de mas.
+    """
+    if not fresh or not cfg.llm_enabled:
+        return fresh
+
+    clasificador = Classifier(cfg.llm_model)
+    if not clasificador.enabled:
+        log.info("sin GEMINI_API_KEY: solo actúa la capa de reglas")
+        return fresh
+
+    pendientes = [x for x in fresh if state.verdict(x.uid) is None][: cfg.llm_max_batch]
+    if pendientes:
+        for uid, (veredicto, _motivo) in clasificador.classify(pendientes).items():
+            state.set_verdict(uid, veredicto)
+        log.info("clasificados %d anuncios con %s", len(pendientes), cfg.llm_model)
+
+    salen: list[Listing] = []
+    for x in fresh:
+        veredicto = state.verdict(x.uid) or llm.COMPLETA
+        if veredicto == llm.COMPARTIDA:
+            # Se marca como visto para no volver a evaluarlo cada ronda.
+            state.remember(x.uid, x.fingerprint())
+            log.info("descartado por el clasificador: %s %s€ %s", x.portal, x.price, x.url)
+            continue
+        if veredicto == llm.DUDOSO:
+            x.warning = "podría ser alquiler por habitaciones"
+        salen.append(x)
+
+    descartados = len(fresh) - len(salen)
+    if descartados:
+        log.info("el clasificador descartó %d anuncios de habitación", descartados)
+    return salen
 
 
 def _report(scored: list[Listing], fresh: list[Listing], cfg, first_run: bool) -> None:

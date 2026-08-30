@@ -79,6 +79,15 @@ scoring:
   # Por encima de esta nota el aviso se marca como prioritario.
   hot_threshold: 78
 
+# Segunda capa contra los anuncios de habitacion disfrazados de piso entero.
+# Requiere GEMINI_API_KEY; sin clave el bot sigue funcionando solo con reglas.
+llm:
+  enabled: true
+  model: gemini-3.5-flash-lite
+  # Anuncios por peticion. Una sola llamada por ronda, y ninguna si no hay nada
+  # nuevo, para no acercarse siquiera a los limites del tier gratuito.
+  max_batch: 25
+
 portals:
   fotocasa: true
   pisos_com: true

@@ -44,6 +44,8 @@ class Listing:
     transport: dict[str, Any] = field(default_factory=dict)
     score: float = 0.0
     reasons: list[str] = field(default_factory=list)
+    warning: str = ""
+    shared_hint: str = ""
     price_per_m2: float | None = None
     deal_ratio: float | None = None
 
