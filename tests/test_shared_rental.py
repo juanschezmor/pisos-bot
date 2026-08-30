@@ -24,6 +24,12 @@ DEBE_SALTAR = [
     "Quedan 2 habitaciones libres",
     "250 € por persona al mes",
     "Se alquila habitación en piso céntrico",
+    # Anuncio real: residencia de estudiantes en La Cartuja, anunciada en
+    # inglés, que ningún patrón en español detectaba.
+    "Sevilla Lago is a student accommodation located in La Cartuja, close to the university",
+    "Bright private room in a shared flat, all bills included",
+    "Looking for a flatmate from September, 350 per person",
+    "Modern coliving space in the city centre",
 ]
 
 # El motivo por el que cada uno NO debe saltar, para que quede claro al leerlo.
@@ -44,6 +50,10 @@ NO_DEBE_SALTAR = [
      "'disponibles' se refiere a la fecha, no a plazas libres"),
     ("Piso exclusivo para estudiantes curso 2026-2027 en calle peatonal",
      "ambiguo a proposito: lo resuelve el clasificador, no las reglas"),
+    ("Bright apartment in the city centre, fully furnished, two bedrooms",
+     "en ingles pero es la vivienda entera"),
+    ("Spacious flat with living room and private terrace",
+     "'private terrace' no es 'private room'"),
 ]
 
 

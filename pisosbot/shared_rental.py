@@ -49,6 +49,17 @@ _PATTERNS: list[tuple[str, re.Pattern]] = [
     ("piso compartido", re.compile(r"\bpiso\s+compartido\b|\bcompartir\s+(?:el\s+)?piso\b")),
     # "quedan 2 habitaciones disponibles" -> exige el cuantificador delante,
     # para no chocar con "3 habitaciones" a secas.
+    # Las residencias de estudiantes y los coliving de Sevilla se anuncian a
+    # menudo en ingles, para captar estudiantes internacionales. Alquilan por
+    # plaza, no la vivienda entera, y ningun patron en espanol los coge.
+    ("anuncio en inglés por habitación", re.compile(
+        r"\bstudent (?:accommodation|housing|residence)\b"
+        r"|\bshared (?:flat|apartment|room)\b"
+        r"|\bflat ?mates?\b|\broom ?mates?\b"
+        r"|\bper (?:room|person)\b"
+        r"|\bprivate room\b|\bensuite room\b"
+        r"|\bco ?living\b"
+    )),
     ("quedan habitaciones libres", re.compile(
         r"\b(?:quedan?|hay|aun)\s+\d*\s*habitacion\w*\s+(?:libres?|disponibles?)\b"
     )),
