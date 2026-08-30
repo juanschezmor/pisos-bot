@@ -24,12 +24,18 @@ siguiente ronda ya usa la configuración nueva.
 
 ## Portales
 
-| Portal | Cobertura | Datos que aporta |
-|---|---|---|
-| **Fotocasa** | Provincia entera, filtrada y ordenada por fecha | JSON embebido: coordenadas GPS, hora exacta de publicación, particular/agencia |
-| **pisos.com** | Comarcas Sevilla capital, Aljarafe y Área de Sevilla | Coordenadas vía `ld+json` |
-| **Habitaclia** | 6 municipios principales | Particular/agencia |
-| **Milanuncios** | Provincia, ordenado por fecha | Muchos particulares |
+| Portal | Cobertura | Datos que aporta | ¿Desde GitHub Actions? |
+|---|---|---|---|
+| **Fotocasa** | Provincia entera, filtrada y ordenada por fecha | JSON embebido: coordenadas GPS, hora exacta de publicación, particular/agencia | ❌ 403 |
+| **pisos.com** | Comarcas Sevilla capital, Aljarafe y Área de Sevilla | Coordenadas vía `ld+json` | ✅ |
+| **Habitaclia** | 6 municipios principales | Particular/agencia | ✅ |
+| **Milanuncios** | Provincia, ordenado por fecha | Muchos particulares | ❌ 403 |
+
+**Fotocasa y Milanuncios bloquean las IPs de centro de datos**, así que desde
+los runners de GitHub devuelven 403; desde una conexión doméstica funcionan sin
+problema. Por eso el workflow de la nube corre solo con `PISOS_PORTALS=pisos_com,habitaclia`.
+Para recuperar los otros dos hay que ejecutar desde una IP residencial
+(`--portals fotocasa,milanuncios` en el Mac, o un runner self-hosted).
 
 **Idealista no está**, y conviene saber por qué: bloquea el acceso automatizado
 con DataDome y devuelve 403 a cualquier petición. Su API oficial son 100

@@ -38,6 +38,10 @@ jobs:
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          # Fotocasa y Milanuncios devuelven 403 a las IPs de centro de datos
+          # de GitHub (desde una conexion domestica responden sin problema).
+          # No tiene sentido pedirselo cada 10 minutos para que nos bloqueen.
+          PISOS_PORTALS: pisos_com,habitaclia
         run: |
           python -m pisosbot.main ${{ inputs.dry_run && '--dry-run' || '' }}
 

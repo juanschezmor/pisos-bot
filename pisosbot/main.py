@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import argparse
 import logging
+import os
 import pathlib
 import sys
 
@@ -21,10 +22,12 @@ log = logging.getLogger("pisosbot")
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 
 
-def collect_all(cfg: config.Config) -> list[Listing]:
+def collect_all(cfg: config.Config, only: set[str] | None = None) -> list[Listing]:
     fetcher = Fetcher(min_delay=cfg.min_delay)
     found: list[Listing] = []
     for key, cls in ALL.items():
+        if only is not None and key not in only:
+            continue
         if not cfg.portals.get(key, True):
             log.info("[%s] desactivado en config", key)
             continue
@@ -43,7 +46,17 @@ def run(args: argparse.Namespace) -> int:
     state = State(pathlib.Path(args.state))
     first_run = state.is_first_run
 
-    raw = collect_all(cfg)
+    only = None
+    if args.portals:
+        only = {p.strip() for p in args.portals.split(",") if p.strip()}
+        desconocidos = only - set(ALL)
+        if desconocidos:
+            log.error("portales desconocidos: %s (válidos: %s)",
+                      ", ".join(sorted(desconocidos)), ", ".join(ALL))
+            return 2
+        log.info("solo estos portales: %s", ", ".join(sorted(only)))
+
+    raw = collect_all(cfg, only)
     log.info("recogidos %d anuncios en bruto", len(raw))
 
     kept, rejected = filters.apply(raw, cfg)
@@ -130,6 +143,8 @@ def main() -> int:
     ap.add_argument("--config", default=str(ROOT / "config.yaml"))
     ap.add_argument("--state", default=str(ROOT / "state" / "seen.json"))
     ap.add_argument("--dry-run", action="store_true", help="no envía nada ni guarda estado")
+    ap.add_argument("--portals", default=os.environ.get("PISOS_PORTALS", ""),
+                    help="lista separada por comas; por defecto, todos")
     ap.add_argument("--seed", action="store_true",
                     help="marca lo visible como visto sin enviar avisos")
     ap.add_argument("-v", "--verbose", action="store_true")
