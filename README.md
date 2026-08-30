@@ -108,6 +108,26 @@ python3 -m venv .venv && ./.venv/bin/pip install -r requirements.txt
 `--dry-run` imprime los mejores anuncios con su nota y el desglose, sin tocar
 Telegram ni el estado.
 
+### Mirar Fotocasa y Milanuncios a mano
+
+Son los dos que GitHub no puede ver, pero desde tu conexión sí responden. Este
+comando no necesita credenciales y no toca el estado ni Telegram:
+
+```bash
+./.venv/bin/python -m pisosbot.main --portals fotocasa,milanuncios --dry-run
+```
+
+Útil cuando quieras barrer a fondo antes de una tanda de visitas.
+
+### Después de cambiar los filtros
+
+Si tocas `config.yaml` y se amplía la búsqueda, `--seed` marca todo lo visible
+como visto para que la siguiente ronda no te mande 40 avisos de golpe:
+
+```bash
+./.venv/bin/python -m pisosbot.main --seed
+```
+
 ## Cómo está montado
 
 ```
