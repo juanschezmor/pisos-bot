@@ -25,9 +25,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
           cache: pip
@@ -44,13 +44,15 @@ jobs:
       - name: Guardar los anuncios ya vistos
         if: ${{ !inputs.dry_run }}
         run: |
-          if git diff --quiet -- state/; then
+          # 'git add' antes de comparar: seen.json nace sin rastrear en cada
+          # runner, y 'git diff' a secas solo mira ficheros ya rastreados.
+          git add -A state/
+          if git diff --cached --quiet; then
             echo "Sin novedades: no hay nada que guardar."
             exit 0
           fi
           git config user.name  "pisos-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add state/
           git commit -m "estado: anuncios vistos $(date -u +'%Y-%m-%d %H:%M')"
           # Otra ronda puede haber empujado mientras tanto.
           for i in 1 2 3; do

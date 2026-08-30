@@ -15,7 +15,7 @@ jobs:
   touch:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - run: |
           date -u +'%Y-%m-%d' > state/.keepalive
           git config user.name  "pisos-bot"

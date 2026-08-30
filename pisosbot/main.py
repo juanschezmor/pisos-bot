@@ -65,6 +65,15 @@ def run(args: argparse.Namespace) -> int:
         _report(scored, fresh, cfg, first_run)
         return 0
 
+    if args.seed:
+        # Marca todo lo visible como ya visto, sin avisar. Util para arrancar
+        # sin inundar y despues de tocar los filtros de config.yaml.
+        for x in fresh:
+            state.remember(x.uid, x.fingerprint())
+        state.save()
+        log.info("marcados %d anuncios como vistos, sin enviar nada", len(fresh))
+        return 0
+
     tg = Telegram()
     if not tg.enabled:
         log.error("faltan TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID; no se envia nada")
@@ -121,6 +130,8 @@ def main() -> int:
     ap.add_argument("--config", default=str(ROOT / "config.yaml"))
     ap.add_argument("--state", default=str(ROOT / "state" / "seen.json"))
     ap.add_argument("--dry-run", action="store_true", help="no envía nada ni guarda estado")
+    ap.add_argument("--seed", action="store_true",
+                    help="marca lo visible como visto sin enviar avisos")
     ap.add_argument("-v", "--verbose", action="store_true")
     args = ap.parse_args()
 
