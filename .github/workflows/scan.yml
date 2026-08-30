@@ -1,0 +1,60 @@
+name: Buscar pisos
+
+on:
+  schedule:
+    # Cada 10 minutos, desplazado de la hora en punto: GitHub retrasa los
+    # workflows programados 5-30 min a las :00, y mucho menos a mitad de hora.
+    - cron: "3,13,23,33,43,53 * * * *"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Solo simular (no envía a Telegram ni guarda estado)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+# Nunca dos rondas a la vez: se pisarian al commitear el estado.
+concurrency:
+  group: buscar-pisos
+  cancel-in-progress: false
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: Buscar y avisar
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          python -m pisosbot.main ${{ inputs.dry_run && '--dry-run' || '' }}
+
+      - name: Guardar los anuncios ya vistos
+        if: ${{ !inputs.dry_run }}
+        run: |
+          if git diff --quiet -- state/; then
+            echo "Sin novedades: no hay nada que guardar."
+            exit 0
+          fi
+          git config user.name  "pisos-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add state/
+          git commit -m "estado: anuncios vistos $(date -u +'%Y-%m-%d %H:%M')"
+          # Otra ronda puede haber empujado mientras tanto.
+          for i in 1 2 3; do
+            git pull --rebase --autostash && git push && exit 0
+            sleep 5
+          done
+          exit 1

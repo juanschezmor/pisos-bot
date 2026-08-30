@@ -1,0 +1,303 @@
+[
+ {
+  "name": "Bellavista",
+  "mode": "cercanias",
+  "lat": 37.32152,
+  "lon": -5.964232,
+  "line": ""
+ },
+ {
+  "name": "Benacazón",
+  "mode": "cercanias",
+  "lat": 37.357112,
+  "lon": -6.207986,
+  "line": ""
+ },
+ {
+  "name": "Camas",
+  "mode": "cercanias",
+  "lat": 37.417951,
+  "lon": -6.040779,
+  "line": ""
+ },
+ {
+  "name": "Cantaelgallo",
+  "mode": "cercanias",
+  "lat": 37.278492,
+  "lon": -5.910657,
+  "line": ""
+ },
+ {
+  "name": "Cartuja",
+  "mode": "cercanias",
+  "lat": 37.40724,
+  "lon": -6.010122,
+  "line": ""
+ },
+ {
+  "name": "Dos Hermanas",
+  "mode": "cercanias",
+  "lat": 37.287216,
+  "lon": -5.923317,
+  "line": ""
+ },
+ {
+  "name": "El Cáñamo",
+  "mode": "cercanias",
+  "lat": 37.486306,
+  "lon": -5.932897,
+  "line": ""
+ },
+ {
+  "name": "Estadio Olímpico",
+  "mode": "cercanias",
+  "lat": 37.417281,
+  "lon": -6.007513,
+  "line": ""
+ },
+ {
+  "name": "Jardines de Hércules",
+  "mode": "cercanias",
+  "lat": 37.332923,
+  "lon": -5.964002,
+  "line": ""
+ },
+ {
+  "name": "La Rinconada",
+  "mode": "cercanias",
+  "lat": 37.479942,
+  "lon": -5.939903,
+  "line": ""
+ },
+ {
+  "name": "Padre Pío-Palmete",
+  "mode": "cercanias",
+  "lat": 37.370818,
+  "lon": -5.939326,
+  "line": ""
+ },
+ {
+  "name": "Palacio de Congresos",
+  "mode": "cercanias",
+  "lat": 37.403683,
+  "lon": -5.936397,
+  "line": ""
+ },
+ {
+  "name": "Salteras",
+  "mode": "cercanias",
+  "lat": 37.410291,
+  "lon": -6.098971,
+  "line": ""
+ },
+ {
+  "name": "San Bernardo",
+  "mode": "cercanias",
+  "lat": 37.377661,
+  "lon": -5.979535,
+  "line": ""
+ },
+ {
+  "name": "San Jerónimo",
+  "mode": "cercanias",
+  "lat": 37.433775,
+  "lon": -5.981452,
+  "line": ""
+ },
+ {
+  "name": "Sanlúcar la Mayor",
+  "mode": "cercanias",
+  "lat": 37.381473,
+  "lon": -6.193744,
+  "line": ""
+ },
+ {
+  "name": "Sevilla - Santa Justa",
+  "mode": "cercanias",
+  "lat": 37.392092,
+  "lon": -5.975206,
+  "line": "51003"
+ },
+ {
+  "name": "Utrera",
+  "mode": "cercanias",
+  "lat": 37.183344,
+  "lon": -5.79024,
+  "line": ""
+ },
+ {
+  "name": "Valencina-Santiponce",
+  "mode": "cercanias",
+  "lat": 37.426656,
+  "lon": -6.056877,
+  "line": ""
+ },
+ {
+  "name": "Villanueva del Ariscal y Olivares",
+  "mode": "cercanias",
+  "lat": 37.407225,
+  "lon": -6.148288,
+  "line": ""
+ },
+ {
+  "name": "Virgen del Rocío",
+  "mode": "cercanias",
+  "lat": 37.362813,
+  "lon": -5.975822,
+  "line": ""
+ },
+ {
+  "name": "1º de Mayo",
+  "mode": "metro",
+  "lat": 37.380736,
+  "lon": -5.955689,
+  "line": ""
+ },
+ {
+  "name": "Amate",
+  "mode": "metro",
+  "lat": 37.375825,
+  "lon": -5.952657,
+  "line": ""
+ },
+ {
+  "name": "Blas Infante",
+  "mode": "metro",
+  "lat": 37.373224,
+  "lon": -6.010459,
+  "line": "548"
+ },
+ {
+  "name": "Casilla de los Pinos",
+  "mode": "metro",
+  "lat": 37.292754,
+  "lon": -5.94254,
+  "line": ""
+ },
+ {
+  "name": "Cavaleri",
+  "mode": "metro",
+  "lat": 37.353033,
+  "lon": -6.046781,
+  "line": ""
+ },
+ {
+  "name": "Ciudad Expo",
+  "mode": "metro",
+  "lat": 37.349261,
+  "lon": -6.051692,
+  "line": ""
+ },
+ {
+  "name": "Cocheras",
+  "mode": "metro",
+  "lat": 37.367768,
+  "lon": -5.950412,
+  "line": ""
+ },
+ {
+  "name": "Condequinto",
+  "mode": "metro",
+  "lat": 37.346559,
+  "lon": -5.936283,
+  "line": ""
+ },
+ {
+  "name": "Europa",
+  "mode": "metro",
+  "lat": 37.337576,
+  "lon": -5.9352,
+  "line": ""
+ },
+ {
+  "name": "Gran Plaza",
+  "mode": "metro",
+  "lat": 37.381657,
+  "lon": -5.966742,
+  "line": ""
+ },
+ {
+  "name": "La Plata",
+  "mode": "metro",
+  "lat": 37.371546,
+  "lon": -5.951796,
+  "line": ""
+ },
+ {
+  "name": "Montequinto",
+  "mode": "metro",
+  "lat": 37.342116,
+  "lon": -5.934608,
+  "line": ""
+ },
+ {
+  "name": "Nervión",
+  "mode": "metro",
+  "lat": 37.382985,
+  "lon": -5.973986,
+  "line": ""
+ },
+ {
+  "name": "Olivar de Quintos",
+  "mode": "metro",
+  "lat": 37.329407,
+  "lon": -5.938342,
+  "line": ""
+ },
+ {
+  "name": "Pablo de Olavide",
+  "mode": "metro",
+  "lat": 37.354004,
+  "lon": -5.943667,
+  "line": ""
+ },
+ {
+  "name": "Parque de los Príncipes",
+  "mode": "metro",
+  "lat": 37.376491,
+  "lon": -6.004755,
+  "line": ""
+ },
+ {
+  "name": "Plaza de Cuba",
+  "mode": "metro",
+  "lat": 37.37925,
+  "lon": -5.999373,
+  "line": ""
+ },
+ {
+  "name": "Prado San Sebastián",
+  "mode": "metro",
+  "lat": 37.380774,
+  "lon": -5.987195,
+  "line": ""
+ },
+ {
+  "name": "Puerta de Jerez",
+  "mode": "metro",
+  "lat": 37.381785,
+  "lon": -5.99436,
+  "line": ""
+ },
+ {
+  "name": "San Bernardo",
+  "mode": "metro",
+  "lat": 37.378213,
+  "lon": -5.979106,
+  "line": ""
+ },
+ {
+  "name": "San Juan Alto",
+  "mode": "metro",
+  "lat": 37.361697,
+  "lon": -6.038572,
+  "line": ""
+ },
+ {
+  "name": "San Juan Bajo",
+  "mode": "metro",
+  "lat": 37.367019,
+  "lon": -6.025145,
+  "line": ""
+ }
+]

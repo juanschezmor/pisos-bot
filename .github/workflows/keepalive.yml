@@ -1,0 +1,25 @@
+name: Mantener vivo el cron
+
+# GitHub desactiva los workflows programados tras 60 dias sin actividad en el
+# repo. Normalmente los commits de estado bastan, pero si pasas dos meses sin
+# un solo anuncio nuevo el bot se apagaria solo. Esto lo evita.
+on:
+  schedule:
+    - cron: "0 5 1 * *" # el dia 1 de cada mes
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  touch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          date -u +'%Y-%m-%d' > state/.keepalive
+          git config user.name  "pisos-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add state/.keepalive
+          git diff --cached --quiet || git commit -m "keepalive"
+          git push

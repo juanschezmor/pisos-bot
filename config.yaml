@@ -1,0 +1,95 @@
+# ---------------------------------------------------------------------------
+# Que buscamos. Editar este fichero y hacer push basta para cambiar el bot.
+# ---------------------------------------------------------------------------
+
+budget:
+  max_price: 700
+  # Por debajo de esto casi siempre es una habitacion disfrazada o una estafa.
+  min_price: 280
+
+filters:
+  min_surface: 25          # m2; los anuncios sin superficie NO se descartan
+  max_surface: 300         # cota de cordura: por encima es error de parseo o finca
+  max_rooms: 3
+  exclude_temporary: true  # alquiler de temporada / turistico
+  # Frases, no palabras sueltas: "habitacion" a secas tiraba pisos enteros
+  # legitimos ("dispone de 3 habitaciones"). Solo excluimos lo que de verdad
+  # indica que se alquila una habitacion y no la vivienda completa.
+  exclude_keywords:
+    - piso compartido
+    - compartir piso
+    - habitacion en piso
+    - habitacion en el piso
+    - alquilo habitacion
+    - alquiler de habitacion
+    - se alquila habitacion
+    - habitacion individual
+    - habitacion doble
+    - coliving
+    - co living
+    - solo chicas
+    - solo chicos
+    - corta estancia
+    - por meses
+    - alquiler de temporada
+    - alquiler temporal
+    - residencia de estudiantes
+
+# Municipios admitidos. Cualquier anuncio fuera de esta lista se descarta.
+zones:
+  sevilla:
+    - sevilla
+  aljarafe:
+    - san juan de aznalfarache
+    - mairena del aljarafe
+    - tomares
+    - camas
+    - castilleja de la cuesta
+    - castilleja de guzman
+    - bormujos
+    - gines
+    - gelves
+    - palomares del rio
+    - coria del rio
+    - almensilla
+    - espartinas
+    - valencina de la concepcion
+    - santiponce
+    - salteras
+    - bollullos de la mitacion
+  sur_este:
+    - dos hermanas          # incluye Montequinto
+    - alcala de guadaira
+
+# Barrios o pedanias que algunos portales publican como si fueran municipio.
+aliases:
+  montequinto: dos hermanas
+  sevilla capital: sevilla
+  el aljarafe: sevilla
+  ciudad expo: mairena del aljarafe
+  san juan bajo: san juan de aznalfarache
+  san juan alto: san juan de aznalfarache
+
+scoring:
+  weights:
+    transport: 0.40        # prioridad declarada: conexion con Sevilla
+    deal: 0.35             # precio/m2 frente a la mediana de la zona
+    freshness: 0.10        # cuanto antes lo veas, mas opciones tienes
+    private_seller: 0.15   # particular = sin honorarios y responde antes
+  # Por encima de esta nota el aviso se marca como prioritario.
+  hot_threshold: 78
+
+portals:
+  fotocasa: true
+  pisos_com: true
+  habitaclia: true
+  milanuncios: true
+
+runtime:
+  # Segundos minimos entre peticiones a un mismo dominio.
+  min_delay: 1.5
+  # Paginas de resultados por busqueda (ordenadas por mas reciente).
+  pages: 2
+  # Si una ejecucion encuentra mas anuncios nuevos que esto, es la primera vez:
+  # no inunda Telegram, solo manda el resumen y los mejores.
+  flood_guard: 12
